@@ -1,4 +1,4 @@
-name: build
+name: Build
 on:
   workflow_dispatch:
 
@@ -6,13 +6,25 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout job branch
+        uses: actions/checkout@v4
         with:
-          node-version: '20'
-      - run: npm ci || npm install
-      - run: npm run build
-      - uses: actions/upload-artifact@v4
+          ref: ${{ github.ref_name }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci || npm install
+
+      - name: Build
+        run: npm run build
+
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v4
         with:
           name: dist
-          path: dist
+          path: dist/
