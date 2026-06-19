@@ -1,0 +1,10 @@
+# রবীন্দ্র নাট্যভুবন
+
+> A digital archive of Rabindranath Tagore's three symbolic plays: Raktakarabi, Raja, and Achalayatan. Bengali content with summaries, characters, timelines, symbolism, and themes.
+
+## Pages
+- [Home — Tagore biography and play collection](/): Introduction to Rabindranath Tagore and his three featured plays.
+- [নাটকসমূহ — Plays](/natok): Index of all featured plays.
+- [রক্তকরবী (Raktakarabi)](/natok/raktakarabi): Symbolic play on industrial exploitation and liberation.
+- [রাজা (Raja / The King of the Dark Chamber)](/natok/raja): Symbolic play on the search for the unseen king.
+- [অচলায়তন (Achalayatan)](/natok/achalayatan): Symbolic play on the rigidity of institutions and humane education.
