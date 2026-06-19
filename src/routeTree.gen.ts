@@ -9,75 +9,59 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as NatokIndexRouteImport } from './routes/natok.index'
-import { Route as NatokSlugRouteImport } from './routes/natok.$slug'
+import { Route as PlaysSlugRouteImport } from './routes/plays.$slug'
+import { Route as PlaysSlugCharacterCharSlugRouteImport } from './routes/plays.$slug_.character.$charSlug'
 
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const NatokIndexRoute = NatokIndexRouteImport.update({
-  id: '/natok/',
-  path: '/natok/',
+const PlaysSlugRoute = PlaysSlugRouteImport.update({
+  id: '/plays/$slug',
+  path: '/plays/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const NatokSlugRoute = NatokSlugRouteImport.update({
-  id: '/natok/$slug',
-  path: '/natok/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const PlaysSlugCharacterCharSlugRoute =
+  PlaysSlugCharacterCharSlugRouteImport.update({
+    id: '/plays/$slug_/character/$charSlug',
+    path: '/plays/$slug/character/$charSlug',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/natok/$slug': typeof NatokSlugRoute
-  '/natok/': typeof NatokIndexRoute
+  '/plays/$slug': typeof PlaysSlugRoute
+  '/plays/$slug/character/$charSlug': typeof PlaysSlugCharacterCharSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/natok/$slug': typeof NatokSlugRoute
-  '/natok': typeof NatokIndexRoute
+  '/plays/$slug': typeof PlaysSlugRoute
+  '/plays/$slug/character/$charSlug': typeof PlaysSlugCharacterCharSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/natok/$slug': typeof NatokSlugRoute
-  '/natok/': typeof NatokIndexRoute
+  '/plays/$slug': typeof PlaysSlugRoute
+  '/plays/$slug_/character/$charSlug': typeof PlaysSlugCharacterCharSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/sitemap.xml' | '/natok/$slug' | '/natok/'
+  fullPaths: '/' | '/plays/$slug' | '/plays/$slug/character/$charSlug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/sitemap.xml' | '/natok/$slug' | '/natok'
-  id: '__root__' | '/' | '/sitemap.xml' | '/natok/$slug' | '/natok/'
+  to: '/' | '/plays/$slug' | '/plays/$slug/character/$charSlug'
+  id: '__root__' | '/' | '/plays/$slug' | '/plays/$slug_/character/$charSlug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
-  NatokSlugRoute: typeof NatokSlugRoute
-  NatokIndexRoute: typeof NatokIndexRoute
+  PlaysSlugRoute: typeof PlaysSlugRoute
+  PlaysSlugCharacterCharSlugRoute: typeof PlaysSlugCharacterCharSlugRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -85,18 +69,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/natok/': {
-      id: '/natok/'
-      path: '/natok'
-      fullPath: '/natok/'
-      preLoaderRoute: typeof NatokIndexRouteImport
+    '/plays/$slug': {
+      id: '/plays/$slug'
+      path: '/plays/$slug'
+      fullPath: '/plays/$slug'
+      preLoaderRoute: typeof PlaysSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/natok/$slug': {
-      id: '/natok/$slug'
-      path: '/natok/$slug'
-      fullPath: '/natok/$slug'
-      preLoaderRoute: typeof NatokSlugRouteImport
+    '/plays/$slug_/character/$charSlug': {
+      id: '/plays/$slug_/character/$charSlug'
+      path: '/plays/$slug/character/$charSlug'
+      fullPath: '/plays/$slug/character/$charSlug'
+      preLoaderRoute: typeof PlaysSlugCharacterCharSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -104,20 +88,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  SitemapDotxmlRoute: SitemapDotxmlRoute,
-  NatokSlugRoute: NatokSlugRoute,
-  NatokIndexRoute: NatokIndexRoute,
+  PlaysSlugRoute: PlaysSlugRoute,
+  PlaysSlugCharacterCharSlugRoute: PlaysSlugCharacterCharSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
