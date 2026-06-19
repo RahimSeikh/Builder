@@ -24,10 +24,27 @@ jobs:
 
       - name: Flatten dist (SPA layout)
         run: |
-          if [ -d dist/client ] && [ -f dist/client/index.html ]; then
-            echo "Detected SSR-style build output (dist/client + dist/server). Using dist/client as the artifact."
+          set -e
+          if [ ! -d dist ]; then
+            echo "::error::No dist/ directory was produced by 'npm run build'."
+            exit 1
+          fi
+          # If index.html is not already at dist/index.html, find one inside dist/
+          # and promote its containing folder to be the new dist/ root.
+          if [ ! -f dist/index.html ]; then
+            HTML_PATH="$(find dist -maxdepth 4 -type f -name index.html | head -n 1 || true)"
+            if [ -z "$HTML_PATH" ]; then
+              echo "::error::No index.html found anywhere in dist/."
+              echo "::error::This looks like a pure SSR project (e.g. TanStack Start, Next.js, Remix in SSR mode)."
+              echo "::error::This build service only supports static SPA projects. Switch your project to a standard Vite + React SPA build (no SSR plugin) and try again."
+              echo "dist/ contents:"
+              find dist -maxdepth 3 -print
+              exit 1
+            fi
+            HTML_DIR="$(dirname "$HTML_PATH")"
+            echo "Detected SSR-style build output. Promoting '$HTML_DIR' to be the dist/ root."
             rm -rf dist-out
-            mv dist/client dist-out
+            mv "$HTML_DIR" dist-out
             rm -rf dist
             mv dist-out dist
           fi
