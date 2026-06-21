@@ -1,91 +1,101 @@
 
-# রবীন্দ্র নাট্যভুবন — Build Plan
+# হাসান আজিজুল হক গল্পবিশ্ব — Build Plan
 
-A premium, content-focused Bengali literary archive dedicated to রবীন্দ্রনাথ ঠাকুর and three plays: **রক্তকরবী, রাজা, অচলায়তন**.
+A single-route SPA literary reader. All navigation (writer profile + 3 stories) happens via state, with Framer Motion transitions. No page reloads, no extra routes.
 
-## Note on stack
-The project is on **TanStack Start + React + TypeScript + Tailwind v4 + shadcn/ui** (not Next.js, which isn't supported here). Everything else in your spec is preserved — static JSON data, no DB, no auth, no admin. Routing will use TanStack file-based routes; URLs match your spec.
+## Tech & Setup
 
-## Design direction
-- Palette: deep navy (`#0B1B33`), dark indigo (`#1A1147`), gold accent (`#C9A24B`), warm ivory text (`#F5EFE0`).
-- Typography: **Noto Serif Bengali** for display/headings, **Hind Siliguri** for body — loaded via `<link>` in `__root.tsx`, registered in `@theme` in `src/styles.css`.
-- Aesthetic: digital museum / literary archive — gold rule lines, serif drop-caps, restrained motion (subtle gradient hero, fade-in on scroll), card hover lifts with gold underline.
-- Theatre cues: curtain-style hero divider, ornamental motifs.
+- Existing stack: TanStack Start + React + TS + Tailwind v4 + shadcn (already installed).
+- Add: `framer-motion` (animations only — no AnimatePresence-driven routing).
+- Bengali typography: load **Noto Serif Bengali** (headings) + **Hind Siliguri** (body) via `<link>` in `src/routes/__root.tsx`, register as `--font-display` / `--font-bengali` in `@theme` inside `src/styles.css`.
+- No backend, no Cloud — pure static content from a typed data module.
 
-## Routes (TanStack Start, file-based)
-```
-src/routes/
-  __root.tsx         shell, fonts, nav, footer, JSON-LD Organization
-  index.tsx          /                Home (hero, about, plays grid)
-  natok.index.tsx    /natok           Plays index
-  natok.raktakarabi.tsx    /natok/raktakarabi
-  natok.raja.tsx           /natok/raja
-  natok.achalayatan.tsx    /natok/achalayatan
-```
-Each route sets its own `head()` with Bengali title/description, og:title/description/url, canonical (leaf only), og:type=article on play pages, plus JSON-LD (`CreativeWork`/`Book` per play, `Person` for Tagore on home).
+## Routing
 
-## Data layer
-Static TypeScript modules (typed, easier than JSON for nested content):
-```
-src/data/
-  tagore.ts          biography sections
-  plays/
-    index.ts         play metadata list
-    raktakarabi.ts
-    raja.ts
-    achalayatan.ts
-  types.ts           Play, Character, TimelineEvent, Symbol, Theme, Relationship
-```
-Each play exports: `meta` (title, year, genre, cover), `summary`, `plot` (acts → scenes, collapsible), `characters[]`, `relationships[]`, `timeline[]`, `symbols[]`, `literarySignificance`, `themes[]`.
+- Single route: `src/routes/index.tsx` renders the whole app.
+- Optional `#writer` / `#story-1` hash sync for shareable deep-links (state ↔ `location.hash`), no router involvement.
+- `head()` defaults set on the index route; titles/OG tags updated dynamically per selection via a small `useEffect` that mutates `document.title` and `<meta property="og:*">`.
 
-Content is **originally written in Bengali** by me — no copied passages, no full dialogue, only short referential phrases where unavoidable. Cross-referenced from public knowledge of these plays (Banglapedia/Wikipedia-style facts: publication years, character lists, established thematic readings).
+## Data Model
 
-## Components
-```
-src/components/
-  layout/Nav.tsx              sticky, Home + নাটকসমূহ
-  layout/Footer.tsx
-  home/Hero.tsx               portrait, name, years, intro, animated gradient
-  home/AboutTagore.tsx        biography sections
-  home/PlaysGrid.tsx          3 premium cards
-  play/PlayHero.tsx           title, year, genre, cover
-  play/SectionHeading.tsx     gold-underlined heading with id anchors
-  play/Summary.tsx
-  play/PlotAccordion.tsx      shadcn Accordion for acts/scenes
-  play/CharacterGrid.tsx      cards (name, role, description, importance)
-  play/RelationshipMap.tsx    CSS/SVG node-edge diagram (lightweight, no lib)
-  play/Timeline.tsx           vertical timeline w/ alternating cards
-  play/Symbols.tsx            two-column analysis cards
-  play/LiterarySignificance.tsx
-  play/Themes.tsx             tag chips + expandable analysis
-  play/FloatingTOC.tsx        sticky right-side TOC w/ scroll-spy + smooth scroll; collapses to bottom sheet (shadcn Drawer) on mobile
+`src/data/hasan.ts` — typed, original Bengali analytical content (no story text reproduction). Shape:
+
+```ts
+type Character = { name: string; role: string; psychology: string; symbolism: string };
+type Section = { id: string; title: string; body: string | string[] };
+type Story = {
+  id: string; title: string;
+  overview: { background: string; setting: string; tone: string; socialContext: string };
+  narrative: { beginning: string; conflict: string; escalation: string; climax: string; ending: string };
+  characters: Character[];
+  themes: string[];
+  symbolism: { symbol: string; meaning: string }[];
+  psychology: string[];
+  literaryView: string[];
+  historicalContext: string[];
+  significance: string[];
+};
+type Writer = { name: string; lifespan: string; intro: string; portrait: string };
 ```
 
-## Images
-- Generate a tasteful illustrated portrait of Tagore (premium imagegen, ivory/indigo palette) → `src/assets/tagore.jpg`.
-- Generate 3 theatre-poster style cover illustrations for the plays, each thematically distinct (red oleander/blood lotus for রক্তকরবী, throne in shadow for রাজা, monastery walls cracking for অচলায়তন) → `src/assets/covers/*.jpg`.
-- Optional ornamental divider SVG (gold filigree) inline.
-- Use as og:image on respective play routes.
+Three story entries with original summaries, plot reconstruction, character cards, themes, symbol analyses, psychological notes, literary technique, post-partition context, and legacy notes for each of the three stories.
+
+## Component Structure
+
+```
+src/components/hasan/
+  AppShell.tsx          // sidebar + main, mobile drawer
+  Sidebar.tsx           // writer chip + 3 story buttons (active highlight)
+  WriterView.tsx        // portrait, name, lifespan, intro
+  StoryView.tsx         // composes the 9 sections
+  sections/
+    Overview.tsx
+    NarrativeFlow.tsx   // shadcn Accordion (collapsible 5 beats)
+    Characters.tsx      // Card grid
+    ThemesSociety.tsx
+    Symbolism.tsx
+    Psychology.tsx
+    LiteraryView.tsx
+    HistoricalContext.tsx
+    Significance.tsx
+  SectionNav.tsx        // sticky in-page anchor list (scrollspy)
+```
+
+State: a single `useState<{ kind: 'writer' } | { kind: 'story'; id: string }>` lifted in `AppShell`. No Zustand needed — one consumer.
+
+## Interaction & Motion
+
+- Framer Motion `motion.div` with `key={selection}` for fade+slide on content swap (~250ms).
+- Sidebar items: hover scale, active = left accent bar in muted green.
+- Section anchors scroll within the main column; scroll position preserved per selection via a `Map<selectionKey, scrollTop>` saved on swap.
+- Mobile: sidebar collapses into a top sheet (shadcn `Sheet`) triggered from a header button.
+
+## Design System
+
+Add tokens to `src/styles.css` (`:root` + `.dark`, default to dark):
+
+- Palette (oklch): deep bark `--background`, warm parchment `--foreground`, muted forest green `--primary`, ochre `--accent`, faded sienna `--ring`.
+- `--gradient-paper`, subtle SVG paper-grain `::before` overlay on `<body>`.
+- Typography utilities: `.font-display` (Noto Serif Bengali), body defaults to Hind Siliguri.
+- Generous line-height (1.85) and max-width (~68ch) for Bengali readability.
 
 ## SEO
-- Home: title `রবীন্দ্র নাট্যভুবন — রবীন্দ্রনাথ ঠাকুরের নাট্যজগৎ`, Bengali meta description, og tags, JSON-LD Person.
-- Play pages: title `<play> — রবীন্দ্রনাথ ঠাকুর | রবীন্দ্র নাট্যভুবন`, description summarizing the play, og:type article, canonical leaf, JSON-LD CreativeWork with author=Tagore, datePublished.
-- `public/llms.txt` listing home + 3 play routes.
-- `public/robots.txt` (allow all), `public/sitemap.xml` with the 5 routes.
 
-## Performance
-- Tailwind v4 utilities only; no heavy chart/diagram libs.
-- Images served as JPG, sized to viewport, `loading="lazy"` below the fold.
-- Framer-motion only for hero + section reveals (single small dep) — or pure CSS keyframes to keep bundle lean. **Decision:** pure CSS animations to avoid the dep.
-- Smooth scroll via `scroll-behavior: smooth` + `scroll-margin-top` on section anchors.
+- Index route `head()`: title "হাসান আজিজুল হক গল্পবিশ্ব", description, og:title/description/type=website, twitter card.
+- On selection change, update `document.title` to `${storyTitle} — হাসান আজিজুল হক গল্পবিশ্ব` and sync og:title/description meta tags imperatively.
+- Single H1 ("হাসান আজিজুল হক গল্পবিশ্ব") in shell; story title rendered as H2 inside main.
 
-## Out of scope (per your spec)
-No auth, accounts, comments, admin, blog, payments, AI chat, social, or full-text reproduction of the plays.
+## Out of Scope (per content rules)
 
-## Build order
-1. Tokens (colors, fonts, theme) in `src/styles.css`; fonts via `<link>` in `__root.tsx`; Nav + Footer.
-2. Generate images (Tagore portrait + 3 covers) in parallel.
-3. Author Bengali content data files for Tagore bio + 3 plays.
-4. Home page (Hero, About, PlaysGrid) with SEO.
-5. Play page template + 3 routes wired to data, with FloatingTOC, accordion plot, relationship diagram, timeline.
-6. SEO/JSON-LD, llms.txt, sitemap.xml, robots.txt; verify build.
+- No reproduction of original story text or quotations.
+- All summaries/analyses written as original interpretation.
+
+## Build Steps
+
+1. Install `framer-motion`.
+2. Add fonts via `<link>` in `__root.tsx`; extend `@theme` + token palette in `src/styles.css`.
+3. Author `src/data/hasan.ts` with the writer + 3 fully-populated stories.
+4. Build `AppShell`, `Sidebar`, `WriterView`, `StoryView` + 9 section components.
+5. Wire selection state, hash sync, dynamic meta updates, scroll-position memory.
+6. Replace placeholder in `src/routes/index.tsx` with `<AppShell />` and set route `head()`.
+7. Verify mobile (390px) layout and section transitions in preview.
