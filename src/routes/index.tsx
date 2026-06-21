@@ -1,51 +1,26 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Hero } from "@/components/home/Hero";
-import { AboutTagore } from "@/components/home/AboutTagore";
-import { PlaysGrid } from "@/components/home/PlaysGrid";
+import { AppShell } from "@/components/hasan/AppShell";
+
+const TITLE = "হাসান আজিজুল হক গল্পবিশ্ব — বাংলা ছোটগল্পের বিশ্লেষণ";
+const DESC =
+  "হাসান আজিজুল হকের তিনটি নির্বাচিত ছোটগল্পের আধুনিক, মৌলিক সাহিত্য-বিশ্লেষণ: সমুদ্রের স্বপ্ন: শীতের অরণ্য, আত্মজা ও একটি করবী গাছ, এবং মা-মেয়ের সংসার।";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "রবীন্দ্র নাট্যভুবন — রবীন্দ্রনাথ ঠাকুরের নাট্যজগৎ" },
-      {
-        name: "description",
-        content:
-          "রবীন্দ্রনাথ ঠাকুরের জীবন ও তাঁর তিনটি প্রতীকধর্মী নাটক—রক্তকরবী, রাজা ও অচলায়তন—এর বিস্তৃত সাহিত্যিক বিশ্লেষণ।",
-      },
-      { property: "og:title", content: "রবীন্দ্র নাট্যভুবন" },
-      {
-        property: "og:description",
-        content:
-          "রবীন্দ্রনাথ ঠাকুরের নাট্যজগতের ডিজিটাল আর্কাইভ—সারসংক্ষেপ, চরিত্র, প্রতীক ও থিম-বিশ্লেষণ।",
-      },
+      { title: TITLE },
+      { name: "description", content: DESC },
+      { property: "og:title", content: TITLE },
+      { property: "og:description", content: DESC },
       { property: "og:url", content: "/" },
+      { name: "twitter:title", content: TITLE },
+      { name: "twitter:description", content: DESC },
     ],
     links: [{ rel: "canonical", href: "/" }],
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "Person",
-          name: "রবীন্দ্রনাথ ঠাকুর",
-          alternateName: "Rabindranath Tagore",
-          birthDate: "1861-05-07",
-          deathDate: "1941-08-07",
-          nationality: "Indian",
-          award: "Nobel Prize in Literature (1913)",
-        }),
-      },
-    ],
   }),
   component: Index,
 });
 
 function Index() {
-  return (
-    <>
-      <Hero />
-      <AboutTagore />
-      <PlaysGrid />
-    </>
-  );
+  return <AppShell />;
 }
